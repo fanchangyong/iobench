@@ -2,73 +2,77 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
-#include "../deps/sockutil/sock_util.h"
+#include <strings.h>
 
-int process_conn(int fd)
+#include "conn_fork.h"
+
+#define SERVERTYPE_FORK   1
+#define SERVERTYPE_THREAD 2
+
+struct config
 {
-	char buf[]="hello,client!";
+	int isserver;
+	unsigned short port;
+	char addr[1024];
+	int servertype;
+};
+
+typedef struct config config;
+
+config conf;
+
+int parse_config(int argc,char** argv)
+{
+	bzero(&conf,sizeof(conf));
 	for(;;)
 	{
-		char * rbuf = malloc(1024);
-		int rn = read(fd,rbuf,1024);
-		if(rn==0)
+		int c = getopt(argc,argv,"st");
+		switch(c)
 		{
-			printf("client over");
-			return 0;
+			case 's':
+				{
+					conf.isserver = 1;
+					break;
+				}
+			case 't':
+				{
+					if(strcmp("fork",optarg)==0)
+					{
+						conf.servertype = SERVERTYPE_FORK;
+					}
+					else if(strcmp("thread",optarg)==0)
+					{
+						conf.servertype = SERVERTYPE_THREAD;
+					}
+				}
 		}
-		else if(rn<0)
-		{
-			perror("read");
-			return 1;
-		}
-		else
-		{
-			printf("client said:%s\n",rbuf);
-		}
-		int n = write(fd,buf,sizeof(buf)+1);
-		if(n==-1)
-		{
-			perror("write");
-			return 1;
-		}
+	}
+
+	if(optind<argc)
+	{
+		strcpy(conf.addr,argv[optind++]);
+	}
+	
+	if(optind<argc)
+	{
+		conf.port = atoi(argv[optind++]);
 	}
 	return 0;
 }
 
 int main(int argc,char** argv)
 {
-	int fd = tcp_server(8888);
-	if(fd==-1)
+	parse_config(argc,argv);
+	if(conf.isserver)
 	{
-		perror("tcp_server");
-		return 1;
-	}
-
-	signal(SIGCHLD,SIG_IGN);
-
-	for(;;)
-	{
-		struct sockaddr_in cli_addr;
-		int cli_sock = tcp_accept(fd,&cli_addr);
-		if(cli_sock==-1)
+		if(conf.servertype==SERVERTYPE_FORK)
 		{
-			perror("tcp_accept");
-			return 1;
-		}
-
-		// create process to handle connection
-		pid_t pid = fork();
-		if(pid<0)
-		{
-			perror("fork");
-			return 1;
-		}
-		else if(pid==0)
-		{
-			// child process
-			exit(process_conn(cli_sock));
+			do_conn_fork(conf.port);
 		}
 	}
-	return 0;
+	else
+	{
+
+	}
 }
 
