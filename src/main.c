@@ -1,18 +1,25 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 #include "../deps/sockutil/sock_util.h"
 
-void process_conn(int fd)
+int process_conn(int fd)
 {
 	char buf[]="hello,client!";
 	for(;;)
 	{
 		char * rbuf = malloc(1024);
 		int rn = read(fd,rbuf,1024);
-		if(rn<=0)
+		if(rn==0)
 		{
-			return;
+			printf("client over");
+			return 0;
+		}
+		else if(rn<0)
+		{
+			perror("read");
+			return 1;
 		}
 		else
 		{
@@ -22,9 +29,10 @@ void process_conn(int fd)
 		if(n==-1)
 		{
 			perror("write");
-			return;
+			return 1;
 		}
 	}
+	return 0;
 }
 
 int main(int argc,char** argv)
@@ -35,6 +43,8 @@ int main(int argc,char** argv)
 		perror("tcp_server");
 		return 1;
 	}
+
+	signal(SIGCHLD,SIG_IGN);
 
 	for(;;)
 	{
@@ -56,7 +66,7 @@ int main(int argc,char** argv)
 		else if(pid==0)
 		{
 			// child process
-			process_conn(cli_sock);
+			exit(process_conn(cli_sock));
 		}
 	}
 	return 0;
