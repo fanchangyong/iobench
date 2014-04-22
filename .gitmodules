@@ -1,0 +1,3 @@
+[submodule "deps/sockutil"]
+	path = deps/sockutil
+	url = git@github.com:fanchangyong/sockutil.git
