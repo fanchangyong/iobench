@@ -13,7 +13,7 @@ int process_conn(int fd)
 		int rn = read(fd,rbuf,1024);
 		if(rn==0)
 		{
-			printf("client over");
+			printf("**client over**\n");
 			return 0;
 		}
 		else if(rn<0)
@@ -44,6 +44,7 @@ int do_conn_fork(unsigned short port)
 		return 1;
 	}
 
+	printf("Server Startupt at : %d\n",port);
 	signal(SIGCHLD,SIG_IGN);
 
 	for(;;)
