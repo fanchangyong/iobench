@@ -27,6 +27,10 @@ int parse_config(config *conf,int argc,char** argv)
 					{
 						conf->servertype = SERVERTYPE_THREAD;
 					}
+					else if(strcmp("kqueue",optarg)==0)
+					{
+						conf->servertype = SERVERTYPE_KQUEUE;
+					}
 					break;
 				}
 			case 'p':

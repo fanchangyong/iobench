@@ -16,5 +16,6 @@ int parse_config(config *conf,int argc,char** argv);
 
 #define SERVERTYPE_FORK   1
 #define SERVERTYPE_THREAD 2
+#define SERVERTYPE_KQUEUE 3
 
 #endif

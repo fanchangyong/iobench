@@ -2,10 +2,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <pthread.h>
 #include "../deps/sockutil/sock_util.h"
 
-static int process_conn(int fd)
+static void* process_conn(void* pfd)
 {
+	int fd = *(int*)pfd;
 	char buf[]="hello,client!";
 	for(;;)
 	{
@@ -19,7 +21,7 @@ static int process_conn(int fd)
 		else if(rn<0)
 		{
 			perror("read");
-			return 1;
+			return NULL;
 		}
 		else
 		{
@@ -29,13 +31,14 @@ static int process_conn(int fd)
 		if(n==-1)
 		{
 			perror("write");
-			return 1;
+			return NULL;
 		}
 	}
+	free(pfd);
 	return 0;
 }
 
-int do_conn_fork(unsigned short port)
+int do_conn_thread(unsigned short port)
 {
 	int fd = tcp_server(port);
 	if(fd==-1)
@@ -58,16 +61,13 @@ int do_conn_fork(unsigned short port)
 		}
 
 		// create process to handle connection
-		pid_t pid = fork();
-		if(pid<0)
+		pthread_t threadid;
+		int *pfd = malloc(sizeof(int));
+		*pfd = cli_sock;
+		int ret = pthread_create(&threadid,NULL,process_conn,pfd);
+		if(ret!=0)
 		{
-			perror("fork");
-			close(cli_sock);
-		}
-		else if(pid==0)
-		{
-			// child process
-			exit(process_conn(cli_sock));
+			perror("pthread_create");
 		}
 	}
 	return 0;

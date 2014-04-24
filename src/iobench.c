@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "sock_util.h"
+#include "../deps/sockutil/sock_util.h"
 #include <pthread.h>
 
 /*
@@ -88,7 +88,7 @@ void* statistics(void* arg)
 	}
 }
 
-int main(int argc,char **argv)
+int main1(int argc,char **argv)
 {
 	parse_flag(argc,argv);
 	if(server_flag)
