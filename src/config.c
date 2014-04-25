@@ -3,8 +3,11 @@
 #include "config.h"
 #include <stdlib.h>
 
+int ensure_default(config *conf);
+
 int parse_config(config *conf,int argc,char** argv)
 {
+	bzero(conf,sizeof(config));
 	for(;;)
 	{
 		int c = getopt(argc,argv,"st:p:a:c:");
@@ -31,6 +34,10 @@ int parse_config(config *conf,int argc,char** argv)
 					{
 						conf->servertype = SERVERTYPE_KQUEUE;
 					}
+					else if(strcmp("select",optarg)==0)
+					{
+						conf->servertype = SERVERTYPE_SELECT;
+					}
 					break;
 				}
 			case 'p':
@@ -50,7 +57,29 @@ int parse_config(config *conf,int argc,char** argv)
 				}
 		}
 	}
+	ensure_default(conf);
 
+	return 0;
+}
+
+int ensure_default(config *conf)
+{
+	if(conf->servertype==0)
+	{
+		conf->servertype=SERVERTYPE_KQUEUE;
+	}
+	if(conf->port==0)
+	{
+		conf->port=8888;
+	}
+	if(strcmp(conf->addr,"")==0)
+	{
+		strncpy(conf->addr,"127.0.0.1",sizeof(conf->addr));
+	}
+	if(conf->conncount == 0)
+	{
+		conf->conncount = 1;
+	}
 	return 0;
 }
 

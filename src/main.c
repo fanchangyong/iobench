@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <strings.h>
+#include <math.h>
+#include <sys/syslimits.h>
 
+#include "srv_select.h"
 #include "conn_kqueue.h"
 #include "conn_fork.h"
 #include "conn_thread.h"
@@ -16,6 +19,43 @@ config conf;
 
 int main(int argc,char** argv)
 {
+	/*long n  = sysconf(_SC_OPEN_MAX);*/
+	/*printf("n:%ld\n",n);*/
+	/*return -1;*/
+
+
+	/*struct rlimit rl;*/
+	/*if(getrlimit(RLIMIT_NOFILE,&rl)==-1)*/
+	/*{*/
+		/*perror("getrlimit");*/
+		/*return -1;*/
+	/*}*/
+
+	/*if(rl.rlim_max<OPEN_MAX)*/
+	/*{*/
+		/*rl.rlim_cur = rl.rlim_max;*/
+	/*}*/
+	/*else*/
+	/*{*/
+		/*rl.rlim_cur = OPEN_MAX;*/
+	/*}*/
+	
+	/*if(setrlimit(RLIMIT_NOFILE,&rl)==-1)*/
+	/*{*/
+		/*printf("errno:%d\n",errno);*/
+		/*perror("setrlimit");*/
+		/*return -1;*/
+	/*}*/
+
+	/*// print rlimit*/
+	/*if(getrlimit(RLIMIT_NOFILE,&rl)==-1)*/
+	/*{*/
+		/*perror("getrlimit");*/
+		/*return -1;*/
+	/*}*/
+	/*printf("now limit:%lld,%lld\n",rl.rlim_cur,rl.rlim_max);*/
+
+
 	bzero(&conf,sizeof(config));
 	parse_config(&conf,argc,argv);
 	if(conf.isserver)
@@ -31,6 +71,10 @@ int main(int argc,char** argv)
 		else if(conf.servertype==SERVERTYPE_KQUEUE)
 		{
 			do_conn_kqueue(conf.port);
+		}
+		else if(conf.servertype==SERVERTYPE_SELECT)
+		{
+			do_srv_select(conf.port);
 		}
 	}
 	else
