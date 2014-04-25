@@ -8,6 +8,8 @@ struct config
 	char addr[1024];
 	int servertype;
 	int conncount;
+	int writelen; // write buf length
+	int writecount; // write count
 };
 
 typedef struct config config;

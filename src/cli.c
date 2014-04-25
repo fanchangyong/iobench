@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <time.h>
 #include "cli.h"
 #include "../deps/sockutil/sock_util.h"
 
-int do_conn(const char* addr,unsigned short port,int count,const char* buf,int buflen)
+int do_conn(const char* addr,unsigned short port,int count,int writelen,int writecount)
 {
 	time_t sumtime = 0;
 	int i;
@@ -16,14 +17,20 @@ int do_conn(const char* addr,unsigned short port,int count,const char* buf,int b
 		{
 			return -1;
 		}
-		if(buf && buflen>0)
+		char* buf = malloc(writelen);
+		if(buf && writelen>0)
 		{
-			if(write(fd,buf,buflen)==-1)
+			int j;
+			for(j = 0;j < writecount;j++)
 			{
-				perror("write");
-				return -1;
+				if(write(fd,buf,writelen)==-1)
+				{
+					perror("write");
+					return -1;
+				}
 			}
 		}
+		free(buf);
 		time_t t2 = time(NULL);
 		sumtime += (t2 - t1);
 	}

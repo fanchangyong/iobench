@@ -10,7 +10,7 @@ int parse_config(config *conf,int argc,char** argv)
 	bzero(conf,sizeof(config));
 	for(;;)
 	{
-		int c = getopt(argc,argv,"st:p:a:c:");
+		int c = getopt(argc,argv,"st:p:a:c:w:W:");
 		if(c==-1)
 			break;
 		switch(c)
@@ -55,6 +55,16 @@ int parse_config(config *conf,int argc,char** argv)
 					conf->conncount = atoi(optarg);
 					break;
 				}
+			case 'w':
+				{
+					conf->writelen = atoi(optarg);
+					break;
+				}
+			case 'W':
+				{
+					conf->writecount = atoi(optarg);
+					break;
+				}
 		}
 	}
 	ensure_default(conf);
@@ -79,6 +89,14 @@ int ensure_default(config *conf)
 	if(conf->conncount == 0)
 	{
 		conf->conncount = 1;
+	}
+	if(conf->writelen==0)
+	{
+		conf->writelen = 1024;
+	}
+	if(conf->writecount==0)
+	{
+		conf->writecount = 1;
 	}
 	return 0;
 }

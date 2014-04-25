@@ -79,8 +79,7 @@ int main(int argc,char** argv)
 	}
 	else
 	{
-		static char buf[]="HELLO";
-		if(do_conn(conf.addr,conf.port,conf.conncount,buf,sizeof(buf))==-1)
+		if(do_conn(conf.addr,conf.port,conf.conncount,conf.writelen,conf.writecount)==-1)
 		{
 			printf("conn error:%s\n",strerror(errno));
 		}

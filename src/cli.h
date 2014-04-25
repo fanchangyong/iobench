@@ -1,3 +1,3 @@
 
-int do_conn(const char* addr,unsigned short port,int count,const char* buf,int buflen);
+int do_conn(const char* addr,unsigned short port,int count,int writelen,int writecount);
 
