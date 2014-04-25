@@ -38,6 +38,10 @@ int parse_config(config *conf,int argc,char** argv)
 					{
 						conf->servertype = SERVERTYPE_SELECT;
 					}
+					else if(strcmp("poll",optarg)==0)
+					{
+						conf->servertype = SERVERTYPE_POLL;
+					}
 					break;
 				}
 			case 'p':

@@ -73,9 +73,7 @@ int wait_event(int kq)
 			int sz = pe->data;
 			char *buf = malloc(sz);
 			read(fd,buf,sz);
-			printf("client said:%s\n",buf);
-			static char wbuf[]="hello client";
-			write(fd,wbuf,sizeof(wbuf));
+			write(fd,buf,sz);
 		}
 	}
 	return 0;

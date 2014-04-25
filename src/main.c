@@ -6,6 +6,7 @@
 #include <math.h>
 #include <sys/syslimits.h>
 
+#include "srv_poll.h"
 #include "srv_select.h"
 #include "conn_kqueue.h"
 #include "conn_fork.h"
@@ -75,6 +76,10 @@ int main(int argc,char** argv)
 		else if(conf.servertype==SERVERTYPE_SELECT)
 		{
 			do_srv_select(conf.port);
+		}
+		else if(conf.servertype==SERVERTYPE_POLL)
+		{
+			do_srv_poll(conf.port);
 		}
 	}
 	else
