@@ -7,6 +7,7 @@
 #include <sys/syslimits.h>
 
 #include "srv_poll.h"
+#include "fileio.h"
 #include "srv_select.h"
 #include "conn_kqueue.h"
 #include "conn_fork.h"
@@ -59,7 +60,11 @@ int main(int argc,char** argv)
 
 	bzero(&conf,sizeof(config));
 	parse_config(&conf,argc,argv);
-	if(conf.isserver)
+	if(conf.isfile)
+	{
+		write_file(conf.path,conf.writelen,conf.writecount);
+	}
+	else if(conf.isserver)
 	{
 		if(conf.servertype==SERVERTYPE_FORK)
 		{

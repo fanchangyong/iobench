@@ -10,7 +10,7 @@ int parse_config(config *conf,int argc,char** argv)
 	bzero(conf,sizeof(config));
 	for(;;)
 	{
-		int c = getopt(argc,argv,"st:p:a:c:w:W:");
+		int c = getopt(argc,argv,"st:p:a:c:w:W:f:");
 		if(c==-1)
 			break;
 		switch(c)
@@ -19,6 +19,11 @@ int parse_config(config *conf,int argc,char** argv)
 				{
 					conf->isserver = 1;
 					break;
+				}
+			case 'f':
+				{
+					conf->isfile = 1;
+					strncpy(conf->path,optarg,sizeof(conf->path));
 				}
 			case 't':
 				{

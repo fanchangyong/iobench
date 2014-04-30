@@ -4,12 +4,14 @@
 struct config
 {
 	int isserver;
+	int isfile;
 	unsigned short port;
 	char addr[1024];
 	int servertype;
 	int conncount;
 	int writelen; // write buf length
 	int writecount; // write count
+	char path[1024];
 };
 
 typedef struct config config;
