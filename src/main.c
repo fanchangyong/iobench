@@ -86,6 +86,10 @@ int main(int argc,char** argv)
 		{
 			do_srv_poll(conf.port);
 		}
+		else if(conf.servertype==SERVERTYPE_EPOLL)
+		{
+			do_srv_epoll(conf.port);
+		}
 	}
 	else
 	{

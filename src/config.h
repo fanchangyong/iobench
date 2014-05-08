@@ -23,5 +23,6 @@ int parse_config(config *conf,int argc,char** argv);
 #define SERVERTYPE_KQUEUE 3
 #define SERVERTYPE_SELECT 4
 #define SERVERTYPE_POLL   5
+#define SERVERTYPE_EPOLL  6
 
 #endif

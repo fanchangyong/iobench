@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include "config.h"
 #include <stdlib.h>
+#include <string.h>
 
 int ensure_default(config *conf);
 
@@ -46,6 +47,10 @@ int parse_config(config *conf,int argc,char** argv)
 					else if(strcmp("poll",optarg)==0)
 					{
 						conf->servertype = SERVERTYPE_POLL;
+					}
+					else if(strcmp("epoll",optarg)==0)
+					{
+						conf->servertype = SERVERTYPE_EPOLL;
 					}
 					break;
 				}
