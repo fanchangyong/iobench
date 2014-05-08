@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <strings.h>
+#include <string.h>
 #include <math.h>
-#include <sys/syslimits.h>
 
+#include "srv_epoll.h"
 #include "srv_poll.h"
 #include "fileio.h"
 #include "srv_select.h"

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#ifdef __APPLE__
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -110,3 +112,12 @@ int do_conn_kqueue(unsigned short port)
 	return 0;
 }
 
+#else
+
+int do_conn_kqueue(unsigned short port)
+{
+	printf("Do not support this os!\n");
+	return -1;
+}
+
+#endif
