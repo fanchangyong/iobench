@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <strings.h>
 #include <sys/types.h>
 #include <sys/epoll.h>
 #include <sys/time.h>
@@ -12,9 +13,10 @@
 int reg_epoll_r(int epfd,int fd,int udata)
 {
 	struct epoll_event ev;
+	bzero(&ev,sizeof(ev));
 	ev.events = EPOLLIN;
 	ev.data.fd = fd;
-	ev.data.u32=udata;
+	//ev.data.u32 = udata;
 	return epoll_ctl(epfd,EPOLL_CTL_ADD,fd,&ev);
 }
 
@@ -23,7 +25,7 @@ int del_epoll(int epfd,int fd)
 	epoll_ctl(epfd,EPOLL_CTL_DEL,fd,NULL);
 }
 
-static int wait_event(int epfd)
+static int wait_event(int epfd,int listenfd)
 {
 	const int len = 1024;
 	struct epoll_event events[len];
@@ -32,6 +34,8 @@ static int wait_event(int epfd)
 	{
 		return -1;
 	}
+
+	printf("n:%d\n",n);
 
 	int i;
 	for(i=0;i<n;i++)
@@ -45,7 +49,7 @@ static int wait_event(int epfd)
 			close(fd);
 			del_epoll(epfd,fd);
 		}
-		else if(udata==1)
+		else if(pe->events&EPOLLIN && pe->data.fd==listenfd)
 		{
 			struct sockaddr_in addr;
 			socklen_t len = sizeof(addr);
@@ -56,19 +60,21 @@ static int wait_event(int epfd)
 				return -1;
 			}
 			printf("client fd:%d\n",cli_fd);
-			if(reg_epoll_r(epfd,cli_fd,2)==-1)
+			if(reg_epoll_r(epfd,cli_fd,22)==-1)
 			{
 				perror("reg epoll");
 				return -1;
 			}
 		}
-		else if(udata==2)
+		else
 		{
 			char buf[1024];
 			int rn=read(fd,buf,sizeof(buf));
 			if(rn==0)
 			{
 				printf("read eof\n");
+				close(fd);
+				del_epoll(epfd,fd);
 			}
 			else if(rn<0)
 			{
@@ -97,7 +103,7 @@ int do_srv_epoll(unsigned short port)
 		return 1;
 	}
 
-	if(reg_epoll_r(epfd,fd,1)==-1)
+	if(reg_epoll_r(epfd,fd,11)==-1)
 	{
 		perror("kevent");
 		return -1;
@@ -107,7 +113,8 @@ int do_srv_epoll(unsigned short port)
 
 	for(;;)
 	{
-		wait_event(epfd);
+		if(wait_event(epfd,fd)==-1)
+			return -1;
 	}
 	return 0;
 }
